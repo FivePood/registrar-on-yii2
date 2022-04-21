@@ -7,6 +7,7 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use frontend\models\ContactForm;
+use frontend\models\ApplicationFilingForm;
 
 /**
  * Site controller
@@ -65,9 +66,13 @@ class SiteController extends Controller
      *
      * @return mixed
      */
-    public function actionIndex()
+    public function actionApplicationFiling()
     {
-        return $this->render('index');
+        $model = new ApplicationFilingForm();
+
+        return $this->render('application-filing', [
+            'model' => $model,
+        ]);
     }
 
     /**
