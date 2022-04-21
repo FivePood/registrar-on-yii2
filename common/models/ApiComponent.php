@@ -10,23 +10,38 @@ use Yii;
 class ApiComponent extends Component
 {
     /**
-     * Отправка запроса
-     * @return mixed|null
+     * Отправка запроса на регистрацию домена
+     * @param $domain
      */
-    public function requestRegister()
+    public function requestRegister($domain)
     {
-        $postfields = [
+        $authLogin = [
+            'login' => \Yii::$app->params['login'],
+            'password' => \Yii::$app->params['password'],
         ];
 
-        Yii::debug($postfields);
+        $method = 'domainCreate';
 
-// Инициализируем клиент Guzzle
+        $requestFields = [
+            'auth' => $authLogin,         //информация об авторизации
+            'clientId' => \Yii::$app->params['clientId'],     //идентификатор клиента
+//            'vendorId' => ['demo', 'demo'],     //идентификатор поставщика
+//            'period' => ['demo', 'demo'],       //период регистрации домена
+//            'authCode' => ['demo', 'demo'],     //код авторизации регистрации домена
+//            'noCheck' => ['demo', 'demo'],      //режим без использования whois
+            'domain' => $domain,       //объект с информацией о домене
+        ];
+
+        Yii::debug($requestFields);
+
+        self::request($method, $requestFields);
+    }
+
+    public static function request($method, $requestFields)
+    {
         $client = new GuzzleHttp\Client();
 
-// Делаем GET запрос к https://api.github.com/user (попутно авторизовываясь в GitHub)
-        $res = $client->request('GET', 'https://api.github.com/user', [
-            'auth' => ['user', 'pass']
-        ]);
+        $res = $client->request('GET', "https://vrdemo.virtreg.ru/vr-api?method=$method&params=$requestFields");
 
 // Получаем "200", это 200 OK
         echo $res->getStatusCode();
@@ -57,12 +72,12 @@ class ApiComponent extends Component
         }
         \Yii::debug($array);
 
-        if (empty($array['orderId'])) {
-            Yii::error('Empty orderId');
+        if (empty($array['handle'])) {
+            Yii::error('Empty handle');
             return null;
         }
-        if (empty($array['formUrl'])) {
-            Yii::error('Empty formUrl');
+        if (empty($array['id'])) {
+            Yii::error('Empty id');
             return null;
         }
 

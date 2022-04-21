@@ -6,4 +6,8 @@ return [
     'senderName' => 'Example.com mailer',
     'user.passwordResetTokenExpire' => 3600,
     'user.passwordMinLength' => 8,
+
+    'login' => 'demo',
+    'password' => 'demo',
+    'clientId' => 827,
 ];
