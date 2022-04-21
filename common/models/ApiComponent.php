@@ -13,7 +13,7 @@ class ApiComponent extends Component
      * Отправка запроса на регистрацию домена
      * @param $domain
      */
-    public function requestRegister($domain)
+    public static function requestRegister($domain)
     {
         $authLogin = [
             'login' => \Yii::$app->params['login'],
@@ -34,7 +34,7 @@ class ApiComponent extends Component
 
         Yii::debug($requestFields);
 
-        self::request($method, $requestFields);
+        return self::request($method, $requestFields);
     }
 
     public static function request($method, $requestFields)

@@ -11,15 +11,11 @@ use yii\bootstrap4\ActiveForm;
 <div class="site-application-filing">
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
-        Для подачи заявки укажите доменное имя:
-    </p>
-
     <div class="row">
         <div class="col-lg-5">
             <?php $form = ActiveForm::begin(['id' => 'application-filing-form']); ?>
 
-<!--            --><?//= $form->field($model, 'name')->textInput(['autofocus' => true]) ?>
+            <?= $form->field($model, 'name')->textInput(['autofocus' => true]) ?>
 
             <div class="form-group">
                 <?= Html::submitButton('Подать заявку', ['class' => 'btn btn-primary', 'name' => 'application-filing-button']) ?>

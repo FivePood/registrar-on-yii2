@@ -6,7 +6,7 @@ use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-use frontend\models\ContactForm;
+use frontend\models\UpdateDnsForm;
 use frontend\models\ApplicationFilingForm;
 
 /**
@@ -62,9 +62,7 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays homepage.
-     *
-     * @return mixed
+     * @return string
      */
     public function actionApplicationFiling()
     {
@@ -76,13 +74,11 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays contact page.
-     *
-     * @return mixed
+     * @return string|\yii\web\Response
      */
     public function actionContact()
     {
-        $model = new ContactForm();
+        $model = new UpdateDnsForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
                 Yii::$app->session->setFlash('success', 'Thank you for contacting us. We will respond to you as soon as possible.');
@@ -93,7 +89,7 @@ class SiteController extends Controller
             return $this->refresh();
         }
 
-        return $this->render('contact', [
+        return $this->render('update-dns', [
             'model' => $model,
         ]);
     }
