@@ -1,6 +1,6 @@
 <?php
 
-namespace common\models;
+namespace app\models;
 
 use Yii;
 
@@ -11,7 +11,6 @@ use Yii;
  * @property string|null $name
  * @property int|null $registeredId
  * @property string|null $handle
- * @property string|null $comment
  * @property int|null $createdAt
  * @property int|null $updatedAt
  */
@@ -32,7 +31,7 @@ class Domain extends \yii\db\ActiveRecord
     {
         return [
             [['registeredId', 'createdAt', 'updatedAt'], 'integer'],
-            [['name', 'handle', 'comment'], 'string', 'max' => 255],
+            [['name', 'handle'], 'string', 'max' => 255],
         ];
     }
 
@@ -42,13 +41,12 @@ class Domain extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'domainId' => 'ID',
-            'name' => 'Имя домена',
-            'registeredId' => 'Идентификатор домена',
-            'handle' => 'дескриптор операции',
-            'comment' => 'Комментарий операции',
-            'createdAt' => 'Дата создания ',
-            'updatedAt' => 'Дата обновления',
+            'domainId' => 'Domain ID',
+            'name' => 'Name',
+            'registeredId' => 'Registered ID',
+            'handle' => 'Handle',
+            'createdAt' => 'Created At',
+            'updatedAt' => 'Updated At',
         ];
     }
 }

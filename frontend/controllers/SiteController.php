@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use Yii;
+use yii\base\ErrorException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
@@ -67,6 +68,19 @@ class SiteController extends Controller
     public function actionApplicationFiling()
     {
         $model = new ApplicationFilingForm();
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+
+            try {
+                if ($model->sendRequest()) {
+                    Yii::$app->session->setFlash('success', 'Запрос на регистрацию домена успешно отправлен.');
+                    Yii::$app->session->setFlash('info', "Имя зарегистрированного домена: $model->name");
+                } else {
+                    Yii::$app->session->setFlash('error', 'Не удалось отправить запрос на регистрацию домена.');
+                }
+            } catch (ErrorException $e) {
+                Yii::$app->session->setFlash('error', $e->getMessage());
+            }
+        }
 
         return $this->render('application-filing', [
             'model' => $model,
@@ -80,13 +94,16 @@ class SiteController extends Controller
     {
         $model = new UpdateDnsForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
-                Yii::$app->session->setFlash('success', 'Thank you for contacting us. We will respond to you as soon as possible.');
-            } else {
-                Yii::$app->session->setFlash('error', 'There was an error sending your message.');
-            }
 
-            return $this->refresh();
+            try {
+                if ($model->sendRequest()) {
+                    Yii::$app->session->setFlash('success', 'Запрос на обновления DNS для домена успешно отправлен.');
+                } else {
+                    Yii::$app->session->setFlash('error', 'Не удалось отправить запрос на обновления DNS для домена.');
+                }
+            } catch (ErrorException $e) {
+                Yii::$app->session->setFlash('error', $e->getMessage());
+            }
         }
 
         return $this->render('update-dns', [
