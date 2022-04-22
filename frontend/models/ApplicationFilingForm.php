@@ -49,8 +49,8 @@ class ApplicationFilingForm extends Model
                 'auth' => [
                     'login' => \Yii::$app->params['login'],
                     'password' => \Yii::$app->params['password'],
-                ],         //информация об авторизации
-                'clientId' => \Yii::$app->params['clientId'],     //идентификатор клиента
+                ],
+                'clientId' => \Yii::$app->params['clientId'],
 //            'vendorId' => $this->vendorId,     //идентификатор поставщика
 //            'period' => ['demo', 'demo'],       //период регистрации домена
 //            'authCode' => $this->authCode,     //код авторизации регистрации домена
@@ -58,7 +58,7 @@ class ApplicationFilingForm extends Model
                 'domain' => [
                     'name' => $this->name,
                     'comment' => 'created via API'
-                ],       //объект с информацией о домене
+                ],
             ],
         ];
 
