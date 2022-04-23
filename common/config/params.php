@@ -9,5 +9,4 @@ return [
 
     'login' => 'demo',
     'password' => 'demo',
-    'clientId' => 827,
 ];

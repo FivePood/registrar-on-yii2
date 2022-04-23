@@ -36,7 +36,7 @@ AppAsset::register($this);
     ]);
     $menuItems = [
         ['label' => 'Подача заявки', 'url' => ['/site/application-filing']],
-        ['label' => 'Обновление DNS', 'url' => ['/site/contact']],
+        ['label' => 'Обновление DNS', 'url' => ['/site/update-dns']],
     ];
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav ml-auto'],

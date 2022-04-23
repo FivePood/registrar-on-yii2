@@ -71,9 +71,10 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 
             try {
-                if ($model->sendRequest()) {
+                $name = $model->sendRequest();
+                if ($name) {
                     Yii::$app->session->setFlash('success', 'Запрос на регистрацию домена успешно отправлен.');
-                    Yii::$app->session->setFlash('info', "Имя зарегистрированного домена: $model->name");
+                    Yii::$app->session->setFlash('info', "Имя зарегистрированного домена: $name");
                 } else {
                     Yii::$app->session->setFlash('error', 'Не удалось отправить запрос на регистрацию домена.');
                 }
@@ -90,7 +91,7 @@ class SiteController extends Controller
     /**
      * @return string|\yii\web\Response
      */
-    public function actionContact()
+    public function actionUpdateDns()
     {
         $model = new UpdateDnsForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {

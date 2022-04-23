@@ -13,7 +13,8 @@ use common\models\ApiComponent;
  */
 class UpdateDnsForm extends Model
 {
-    public $id;
+    public $clientId;
+    public $domainId;
     public $dnskey;
 
     /**
@@ -22,7 +23,9 @@ class UpdateDnsForm extends Model
     public function rules()
     {
         return [
-            [['id', 'dnskey'], 'required'],
+            [['domainId', 'dnskey', 'clientId'], 'required'],
+            [['domainId', 'clientId'], 'integer'],
+            ['dnskey', 'string'],
         ];
     }
 
@@ -32,8 +35,9 @@ class UpdateDnsForm extends Model
     public function attributeLabels()
     {
         return [
-            'id' => 'Идентификатор домена',
-            'dnskey' => 'Запись DNSSEC',
+            'clientId' => 'Идентификатор клиента',
+            'domainId' => 'Идентификатор домена',
+            'dnskey' => 'Запись DNSKEY',
         ];
     }
 
@@ -52,8 +56,8 @@ class UpdateDnsForm extends Model
                     'login' => \Yii::$app->params['login'],
                     'password' => \Yii::$app->params['password'],
                 ],
-                'id' => $this->id,
-                'clientId' => \Yii::$app->params['clientId'],
+                'id' => (int)$this->domainId,
+                'clientId' => (int)$this->clientId,
                 'dnssec' => ['dnssec' => $this->dnskey],
             ],
         ];

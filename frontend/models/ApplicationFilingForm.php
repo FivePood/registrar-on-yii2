@@ -13,7 +13,12 @@ use common\models\ApiComponent;
  */
 class ApplicationFilingForm extends Model
 {
+    public $clientId;
     public $name;
+    public $vendorId;
+    public $period;
+    public $authCode;
+    public $noCheck;
 
     /**
      * {@inheritdoc}
@@ -21,7 +26,10 @@ class ApplicationFilingForm extends Model
     public function rules()
     {
         return [
-            ['name', 'required'],
+            [['name', 'clientId'], 'required'],
+            [['clientId', 'period'], 'integer'],
+            [['name', 'vendorId', 'authCode'], 'string', 'max' => 255],
+            ['noCheck', 'boolean'],
         ];
     }
 
@@ -31,16 +39,29 @@ class ApplicationFilingForm extends Model
     public function attributeLabels()
     {
         return [
+            'clientId' => 'Идентификатор клиента',
             'name' => 'Имя домена',
+            'vendorId' => 'Идентификатор поставщика',
+            'period' => 'Период регистрации домена (дней)',
+            'authCode' => 'Код авторизации регистрации домена',
+            'noCheck' => 'Режим без использования whois',
         ];
     }
 
     /**
-     * {@inheritdoc}
      * @throws ErrorException
      */
     public function sendRequest()
     {
+        $matches = parse_url($this->name);
+        $domainName = !empty($matches['host']) ? $matches['host'] : $matches['path'];
+        preg_match("/^((?!-)[A-Za-z0-9-.]{1,63}(?))/", $domainName, $name);
+
+        if (empty($name)) {
+            throw new ErrorException('Неверное имя домена');
+        }
+        $name = $name[0];
+
         $requestFields = [
             'jsonrpc' => '2.0',
             'id' => '',
@@ -50,17 +71,30 @@ class ApplicationFilingForm extends Model
                     'login' => \Yii::$app->params['login'],
                     'password' => \Yii::$app->params['password'],
                 ],
-                'clientId' => \Yii::$app->params['clientId'],
-//            'vendorId' => $this->vendorId,     //идентификатор поставщика
-//            'period' => ['demo', 'demo'],       //период регистрации домена
-//            'authCode' => $this->authCode,     //код авторизации регистрации домена
-//            'noCheck' => $this->noCheck,      //режим без использования whois
+                'clientId' => (int)$this->clientId,
                 'domain' => [
-                    'name' => $this->name,
+                    'name' => $name,
                     'comment' => 'created via API'
                 ],
             ],
         ];
+
+        if (!empty($this->vendorId)) {
+            $requestFields['params']['vendorId'] = $this->vendorId;
+        }
+
+        if (!empty($this->period)) {
+            $period = (int)$this->period * 24 * 60 * 60;
+            $requestFields['params']['period'] = $period;
+        }
+
+        if (!empty($this->authCode)) {
+            $requestFields['params']['authCode'] = $this->authCode;
+        }
+
+        if (!empty($this->noCheck)) {
+            $requestFields['params']['noCheck'] = (int)$this->noCheck;
+        }
 
         Yii::debug($requestFields);
 
@@ -75,7 +109,7 @@ class ApplicationFilingForm extends Model
         }
 
         $domain = new Domain();
-        $domain->name = $this->name;
+        $domain->name = $name;
         $domain->registeredId = $response['id'];
         $domain->handle = $response['handle'];
         $domain->comment = 'Регистрация домена';
@@ -83,6 +117,6 @@ class ApplicationFilingForm extends Model
         $domain->updatedAt = time();
         $domain->save();
 
-        return true;
+        return $name;
     }
 }
