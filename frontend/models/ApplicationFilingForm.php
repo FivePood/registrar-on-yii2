@@ -14,7 +14,7 @@ use common\models\ApiComponent;
 class ApplicationFilingForm extends Model
 {
     public $clientId;
-    public $name;
+    public $domainName;
     public $vendorId;
     public $period;
     public $authCode;
@@ -53,14 +53,52 @@ class ApplicationFilingForm extends Model
      */
     public function sendRequest()
     {
-        $matches = parse_url($this->name);
-        $domainName = !empty($matches['host']) ? $matches['host'] : $matches['path'];
-        preg_match("/^((?!-)[A-Za-z0-9-.]{1,63}(?))/", $domainName, $name);
+        $clientFields = [
+            'jsonrpc' => '2.0',
+            'id' => '',
+            'method' => 'clientCreate',
+            'params' => [
+                'auth' => [
+                    'login' => \Yii::$app->params['login'],
+                    'password' => \Yii::$app->params['password'],
+                ],
+                "client" => [
+                    'legal' => $this->legal,
+                    'nameLocal' => $this->userName,
+                    'birthday' => $this->birthday,
+                    'identity' => [
+                        'type' => $this->type,
+                        'series' => $this->series,
+                        'number' => $this->number,
+                        'issuer' => $this->issuer,
+                        'issued' => $this->issued
+                    ],
+                    'emails' => [
+                        $this->email
+                    ],
+                    'phones' => [
+                        $this->phone
+                    ],
+                    'addressLocal' => [
+                        'index' => $this->index,
+                        'country' => 'RU',
+                        'city' => $this->city,
+                        'street' => $this->street
+                    ]
+                ],
+            ],
+        ];
 
-        if (empty($name)) {
+        $client = ApiComponent::request($clientFields);
+
+        $matches = parse_url($this->domainName);
+        $url = !empty($matches['host']) ? $matches['host'] : $matches['path'];
+        preg_match("/^((?!-)[A-Za-z0-9-.]{1,63}(?))/", $url, $domainName);
+
+        if (empty($domainName)) {
             throw new ErrorException('Неверное имя домена');
         }
-        $name = $name[0];
+        $domainName = $domainName[0];
 
         $requestFields = [
             'jsonrpc' => '2.0',
@@ -73,7 +111,7 @@ class ApplicationFilingForm extends Model
                 ],
                 'clientId' => (int)$this->clientId,
                 'domain' => [
-                    'name' => $name,
+                    'name' => $domainName,
                     'comment' => 'created via API'
                 ],
             ],
@@ -109,7 +147,7 @@ class ApplicationFilingForm extends Model
         }
 
         $domain = new Domain();
-        $domain->name = $name;
+        $domain->name = $domainName;
         $domain->registeredId = $response['id'];
         $domain->handle = $response['handle'];
         $domain->comment = 'Регистрация домена';
@@ -117,6 +155,6 @@ class ApplicationFilingForm extends Model
         $domain->updatedAt = time();
         $domain->save();
 
-        return $name;
+        return $domainName;
     }
 }
