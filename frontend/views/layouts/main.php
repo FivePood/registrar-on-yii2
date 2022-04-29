@@ -9,7 +9,9 @@ use yii\bootstrap4\Breadcrumbs;
 use yii\bootstrap4\Html;
 use yii\bootstrap4\Nav;
 use yii\bootstrap4\NavBar;
+use kartik\icons\FontAwesomeAsset;
 
+FontAwesomeAsset::register($this);
 AppAsset::register($this);
 ?>
 <?php $this->beginPage() ?>

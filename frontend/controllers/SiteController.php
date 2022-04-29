@@ -71,7 +71,7 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 
             try {
-                $name = $model->sendRequest();
+                $name = $model->registration();
                 if ($name) {
                     Yii::$app->session->setFlash('success', 'Запрос на регистрацию домена успешно отправлен.');
                     Yii::$app->session->setFlash('info', "Имя зарегистрированного домена: $name");

@@ -13,12 +13,36 @@ use common\models\ApiComponent;
  */
 class ApplicationFilingForm extends Model
 {
-    public $clientId;
+    public $legal;
+    public $userName;
+    public $toBirthString;
+    public $type;
+    public $series;
+    public $number;
+    public $issuer;
+    public $issued;
+    public $email;
+    public $phone;
+    public $index;
+    public $city;
+    public $street;
+
+
     public $domainName;
+    public $formattedDomainName;
     public $vendorId;
     public $period;
     public $authCode;
     public $noCheck;
+
+    const LEGAL_ORG = 'org';
+    const LEGAL_PERSON = 'person';
+    const LEGAL_PROPRIETOR = 'proprietor';
+
+    const LEGAL_ORG_LABEL = 'Юридическое лицо';
+    const LEGAL_PERSON_LABEL = 'Физическое лицо';
+    const LEGAL_PROPRIETOR_LABEL = 'Индивидуальный предприниматель';
+
 
     /**
      * {@inheritdoc}
@@ -26,10 +50,12 @@ class ApplicationFilingForm extends Model
     public function rules()
     {
         return [
-            [['name', 'clientId'], 'required'],
-            [['clientId', 'period'], 'integer'],
-            [['name', 'vendorId', 'authCode'], 'string', 'max' => 255],
+            [['domainName'], 'required'],
+            [['period', 'issued'], 'integer'],
+            [['legal', 'userName', 'type', 'series', 'number', 'issuer', 'index', 'city', 'street', 'domainName', 'email', 'phone',
+                'vendorId', 'authCode'], 'string', 'max' => 255],
             ['noCheck', 'boolean'],
+            ['toBirthString', 'safe'],
         ];
     }
 
@@ -39,8 +65,21 @@ class ApplicationFilingForm extends Model
     public function attributeLabels()
     {
         return [
-            'clientId' => 'Идентификатор клиента',
-            'name' => 'Имя домена',
+            'legal' => 'Юридический статус',
+            'userName' => 'ФИО или название организации, как это указано в идентифицирующих документах',
+            'birthday' => 'Дата рождения',
+            'type' => 'Идентификатор типа документа',
+            'series' => 'Серия',
+            'number' => 'Номер',
+            'issuer' => 'Кем выдан',
+            'issued' => 'Дата выдачи',
+            'email' => 'Список адресов email',
+            'phone' => 'Список номеров телефонов',
+            'index' => 'Почтовый индекс или код',
+            'city' => 'Название населенного пункта',
+            'street' => 'Информация о местоположении в населенном пункте',
+
+            'domainName' => 'Имя домена',
             'vendorId' => 'Идентификатор поставщика',
             'period' => 'Период регистрации домена (дней)',
             'authCode' => 'Код авторизации регистрации домена',
@@ -48,11 +87,52 @@ class ApplicationFilingForm extends Model
         ];
     }
 
+    public static function legalLabels()
+    {
+        return [
+            self::LEGAL_ORG => self::LEGAL_ORG_LABEL,
+            self::LEGAL_PERSON => self::LEGAL_PERSON_LABEL,
+            self::LEGAL_PROPRIETOR => self::LEGAL_PROPRIETOR_LABEL
+        ];
+    }
+
     /**
+     * @return false
      * @throws ErrorException
      */
-    public function sendRequest()
+    public function registration()
     {
+        $client = $this->sendClientRegistrationRequest();
+
+        $response = $this->sendDomainRegistrationRequest($client['id']);
+
+        if (!empty($response['message'])) {
+            throw new ErrorException($response['message']);
+        }
+
+        if (is_null($response)) {
+            return false;
+        }
+
+        $domain = new Domain();
+        $domain->name = $this->formattedDomainName;
+        $domain->registeredId = $response['id'];
+        $domain->handle = $response['handle'];
+        $domain->comment = 'Регистрация домена';
+        $domain->createdAt = time();
+        $domain->updatedAt = time();
+        $domain->save();
+
+        return $this->formattedDomainName;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    protected function sendClientRegistrationRequest()
+    {
+        $birthday =!empty($this->toBirthString) ? (int)\Yii::$app->formatter->asTimestamp($this->toBirthString) : null;
+
         $clientFields = [
             'jsonrpc' => '2.0',
             'id' => '',
@@ -65,7 +145,7 @@ class ApplicationFilingForm extends Model
                 "client" => [
                     'legal' => $this->legal,
                     'nameLocal' => $this->userName,
-                    'birthday' => $this->birthday,
+                    'birthday' => $birthday,
                     'identity' => [
                         'type' => $this->type,
                         'series' => $this->series,
@@ -89,7 +169,19 @@ class ApplicationFilingForm extends Model
             ],
         ];
 
-        $client = ApiComponent::request($clientFields);
+        return ApiComponent::request($clientFields);
+    }
+
+    /**
+     * @param null $clientId
+     * @return mixed|null
+     * @throws ErrorException
+     */
+    public function sendDomainRegistrationRequest($clientId = null)
+    {
+        if (is_null($clientId)) {
+            throw new ErrorException('Не удалось отправить запрос на регистрацию домена.');
+        }
 
         $matches = parse_url($this->domainName);
         $url = !empty($matches['host']) ? $matches['host'] : $matches['path'];
@@ -98,7 +190,7 @@ class ApplicationFilingForm extends Model
         if (empty($domainName)) {
             throw new ErrorException('Неверное имя домена');
         }
-        $domainName = $domainName[0];
+        $this->formattedDomainName = $domainName[0];
 
         $requestFields = [
             'jsonrpc' => '2.0',
@@ -109,9 +201,9 @@ class ApplicationFilingForm extends Model
                     'login' => \Yii::$app->params['login'],
                     'password' => \Yii::$app->params['password'],
                 ],
-                'clientId' => (int)$this->clientId,
+                'clientId' => (int)$clientId,
                 'domain' => [
-                    'name' => $domainName,
+                    'name' => $this->formattedDomainName,
                     'comment' => 'created via API'
                 ],
             ],
@@ -136,25 +228,6 @@ class ApplicationFilingForm extends Model
 
         Yii::debug($requestFields);
 
-        $response = ApiComponent::request($requestFields);
-
-        if (!empty($response['message'])) {
-            throw new ErrorException($response['message']);
-        }
-
-        if (is_null($response)) {
-            return false;
-        }
-
-        $domain = new Domain();
-        $domain->name = $domainName;
-        $domain->registeredId = $response['id'];
-        $domain->handle = $response['handle'];
-        $domain->comment = 'Регистрация домена';
-        $domain->createdAt = time();
-        $domain->updatedAt = time();
-        $domain->save();
-
-        return $domainName;
+        return ApiComponent::request($requestFields);
     }
 }
