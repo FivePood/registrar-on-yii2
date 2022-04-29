@@ -43,6 +43,16 @@ class ApplicationFilingForm extends Model
     const LEGAL_PERSON_LABEL = 'Физическое лицо';
     const LEGAL_PROPRIETOR_LABEL = 'Индивидуальный предприниматель';
 
+    const TYPE_PASSPORT = 'Паспорт';
+    const TYPE_FOREIGN_CITIZEN_PASSPORT= 'Паспорт иностранного гражданина';
+    const TYPE_SAILOR_PASSPORT = 'Паспорт моряка';
+    const TYPE_IDENTIFICATION = 'Удостоверение личности';
+    const TYPE_IDENTIFICATION_SOLDIER = 'Удостоверение личности военнослужащего';
+    const TYPE_TEMPORARY_IDENTIFICATION = 'Временное удостоверение личности';
+    const TYPE_BIRTH_CERTIFICATE = 'Свидетельство о рождении';
+    const TYPE_MILITARY_ID = 'Военный билет';
+    const TYPE_RESIDENT_VIEW = 'Вид на жительство';
+    const TYPE_ANOTHER = 'Другой';
 
     /**
      * {@inheritdoc}
@@ -50,7 +60,7 @@ class ApplicationFilingForm extends Model
     public function rules()
     {
         return [
-            [['domainName'], 'required'],
+            [['domainName', 'legal', 'userName', 'type', 'index', 'city', 'street'], 'required'],
             [['period', 'issued'], 'integer'],
             [['legal', 'userName', 'type', 'series', 'number', 'issuer', 'index', 'city', 'street', 'domainName', 'email', 'phone',
                 'vendorId', 'authCode'], 'string', 'max' => 255],
@@ -68,17 +78,16 @@ class ApplicationFilingForm extends Model
             'legal' => 'Юридический статус',
             'userName' => 'ФИО или название организации, как это указано в идентифицирующих документах',
             'birthday' => 'Дата рождения',
-            'type' => 'Идентификатор типа документа',
+            'type' => 'Документ',
             'series' => 'Серия',
             'number' => 'Номер',
             'issuer' => 'Кем выдан',
             'issued' => 'Дата выдачи',
             'email' => 'Список адресов email',
             'phone' => 'Список номеров телефонов',
-            'index' => 'Почтовый индекс или код',
+            'index' => 'Почтовый индекс',
             'city' => 'Название населенного пункта',
-            'street' => 'Информация о местоположении в населенном пункте',
-
+            'street' => 'Адрес',
             'domainName' => 'Имя домена',
             'vendorId' => 'Идентификатор поставщика',
             'period' => 'Период регистрации домена (дней)',
@@ -87,6 +96,9 @@ class ApplicationFilingForm extends Model
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public static function legalLabels()
     {
         return [
@@ -96,12 +108,22 @@ class ApplicationFilingForm extends Model
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public static function typeLabels()
     {
         return [
-            self::LEGAL_ORG_LABEL,
-            self::LEGAL_PERSON_LABEL,
-            self::LEGAL_PROPRIETOR_LABEL
+            self::TYPE_PASSPORT,
+            self::TYPE_FOREIGN_CITIZEN_PASSPORT,
+            self::TYPE_SAILOR_PASSPORT,
+            self::TYPE_IDENTIFICATION,
+            self::TYPE_IDENTIFICATION_SOLDIER,
+            self::TYPE_TEMPORARY_IDENTIFICATION,
+            self::TYPE_BIRTH_CERTIFICATE,
+            self::TYPE_MILITARY_ID,
+            self::TYPE_RESIDENT_VIEW,
+            self::TYPE_ANOTHER
         ];
     }
 
