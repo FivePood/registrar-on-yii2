@@ -26,7 +26,17 @@ use kartik\date\DatePicker;
             'placeholder' => 'Выберите юридический статус клиента...'
         ]
     ]);?>
+
     <?= $form->field($model, 'userName')->textInput(['maxlength' => 255]) ?>
+
+    <?= $form->field($model, 'type')->widget(Select2::classname(), [
+        'data' => ApplicationFilingForm::typeLabels(),
+        'hideSearch' => true,
+        'options' => [
+            'id'=>'type',
+            'placeholder' => 'Выберите тип документа...'
+        ]
+    ]);?>
 
     <?= $form->field($model, 'toBirthString')->widget(DatePicker::classname(), [
         'data' => $model->toBirthString,
@@ -40,7 +50,6 @@ use kartik\date\DatePicker;
         ],
     ])->label('Дата рождения') ?>
 
-    <?= $form->field($model, 'type')->textInput(['maxlength' => 255]) ?>
 
     <div class="row justify-content-xl-center">
         <div style='margin-right: 10px'>

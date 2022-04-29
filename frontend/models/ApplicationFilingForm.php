@@ -96,6 +96,15 @@ class ApplicationFilingForm extends Model
         ];
     }
 
+    public static function typeLabels()
+    {
+        return [
+            self::LEGAL_ORG_LABEL,
+            self::LEGAL_PERSON_LABEL,
+            self::LEGAL_PROPRIETOR_LABEL
+        ];
+    }
+
     /**
      * @return false
      * @throws ErrorException
