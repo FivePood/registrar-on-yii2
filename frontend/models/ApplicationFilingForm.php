@@ -13,20 +13,25 @@ use common\models\ApiComponent;
  */
 class ApplicationFilingForm extends Model
 {
-    public $legal;
     public $userName;
-    public $toBirthString;
+    public $inn;
+    public $legal;
     public $type;
+    public $toBirthString;
+    public $toIssuedString;
     public $series;
     public $number;
     public $issuer;
-    public $issued;
-    public $email;
-    public $phone;
+    public $kpp;
+    public $okpo;
     public $index;
     public $city;
     public $street;
-
+    public $email1;
+    public $email2;
+    public $email3;
+    public $phones;
+    public $faxes;
 
     public $domainName;
     public $formattedDomainName;
@@ -34,6 +39,7 @@ class ApplicationFilingForm extends Model
     public $period;
     public $authCode;
     public $noCheck;
+
 
     const LEGAL_ORG = 'org';
     const LEGAL_PERSON = 'person';
@@ -43,16 +49,27 @@ class ApplicationFilingForm extends Model
     const LEGAL_PERSON_LABEL = 'Физическое лицо';
     const LEGAL_PROPRIETOR_LABEL = 'Индивидуальный предприниматель';
 
-    const TYPE_PASSPORT = 'Паспорт';
-    const TYPE_FOREIGN_CITIZEN_PASSPORT= 'Паспорт иностранного гражданина';
-    const TYPE_SAILOR_PASSPORT = 'Паспорт моряка';
-    const TYPE_IDENTIFICATION = 'Удостоверение личности';
-    const TYPE_IDENTIFICATION_SOLDIER = 'Удостоверение личности военнослужащего';
-    const TYPE_TEMPORARY_IDENTIFICATION = 'Временное удостоверение личности';
-    const TYPE_BIRTH_CERTIFICATE = 'Свидетельство о рождении';
-    const TYPE_MILITARY_ID = 'Военный билет';
-    const TYPE_RESIDENT_VIEW = 'Вид на жительство';
-    const TYPE_ANOTHER = 'Другой';
+    const TYPE_PASSPORT = 'passport';
+    const TYPE_FOREIGN_PASS = 'foreignpass';
+    const TYPE_SAILOR_PASS = 'sailorpass';
+    const TYPE_IDENTIFICATION = 'id';
+    const TYPE_MILITARY_CARD = 'militarycard';
+    const TYPE_TEMPORARY_IDENTIFICATION = 'tempid';
+    const TYPE_BIRTH_CERTIFICATE = 'birthcert';
+    const TYPE_MILITARY_ID = 'militaryid';
+    const TYPE_RESIDENT_VIEW = 'residencecert';
+    const TYPE_ANOTHER = 'other';
+
+    const TYPE_PASSPORT_LABEL = 'Паспорт';
+    const TYPE_FOREIGN_PASS_LABEL = 'Паспорт иностранного гражданина';
+    const TYPE_SAILOR_PASS_LABEL = 'Паспорт моряка';
+    const TYPE_IDENTIFICATION_LABEL = 'Удостоверение личности';
+    const TYPE_MILITARY_CARD_LABEL = 'Военный билет';
+    const TYPE_TEMPORARY_IDENTIFICATION_LABEL = 'Временное удостоверение личности';
+    const TYPE_BIRTH_CERTIFICATE_LABEL = 'Свидетельство о рождении';
+    const TYPE_MILITARY_ID_LABEL = 'Удостоверение личности военнослужащего';
+    const TYPE_RESIDENT_VIEW_LABEL = 'Вид на жительство';
+    const TYPE_ANOTHER_LABEL = 'Другой';
 
     /**
      * {@inheritdoc}
@@ -60,12 +77,35 @@ class ApplicationFilingForm extends Model
     public function rules()
     {
         return [
-            [['domainName', 'legal', 'userName', 'type', 'index', 'city', 'street'], 'required'],
-            [['period', 'issued'], 'integer'],
-            [['legal', 'userName', 'type', 'series', 'number', 'issuer', 'index', 'city', 'street', 'domainName', 'email', 'phone',
-                'vendorId', 'authCode'], 'string', 'max' => 255],
+            [['legal', 'userName', 'index', 'city', 'street', 'domainName', 'email1', 'phones'], 'required'],
+            [['userName', 'legal',
+                'type', 'series', 'number', 'issuer',
+                'index', 'city', 'street',
+                'phones', 'faxes',
+                'domainName', 'vendorId', 'authCode'], 'string', 'max' => 255],
+            [['email1', 'email2', 'email3'], 'email'],
+            [['toBirthString', 'toIssuedString'], 'safe'],
+            [['period', 'inn', 'kpp', 'okpo'], 'integer'],
+            [['kpp', 'okpo'], 'string', 'min' => 9],
             ['noCheck', 'boolean'],
-            ['toBirthString', 'safe'],
+            [
+                ['type', 'series', 'number', 'issuer', 'toBirthString', 'toIssuedString'], 'required',
+                'when' => function () {
+                    return ($this->legal == self::LEGAL_PERSON);
+                },
+                'whenClient' => 'function(attribute,value){
+                    return ($("#legal").val()=="person");
+                }',
+            ],
+            [
+                ['inn', 'kpp', 'okpo'], 'required',
+                'when' => function () {
+                    return ($this->legal == self::LEGAL_ORG);
+                },
+                'whenClient' => 'function(attribute,value){
+                    return ($("#legal").val()=="org");
+                }',
+            ],
         ];
     }
 
@@ -82,12 +122,17 @@ class ApplicationFilingForm extends Model
             'series' => 'Серия',
             'number' => 'Номер',
             'issuer' => 'Кем выдан',
-            'issued' => 'Дата выдачи',
-            'email' => 'Список адресов email',
-            'phone' => 'Список номеров телефонов',
+            'email1' => 'E-mail',
+            'email2' => 'E-mail',
+            'email3' => 'E-mail',
+            'phones' => 'Список номеров телефонов',
+            'faxes' => 'Список номеров факсов',
             'index' => 'Почтовый индекс',
             'city' => 'Название населенного пункта',
             'street' => 'Адрес',
+            'inn' => 'ИНН',
+            'kpp' => 'КПП',
+            'okpo' => 'ОКПО',
             'domainName' => 'Имя домена',
             'vendorId' => 'Идентификатор поставщика',
             'period' => 'Период регистрации домена (дней)',
@@ -102,8 +147,8 @@ class ApplicationFilingForm extends Model
     public static function legalLabels()
     {
         return [
-            self::LEGAL_ORG => self::LEGAL_ORG_LABEL,
             self::LEGAL_PERSON => self::LEGAL_PERSON_LABEL,
+            self::LEGAL_ORG => self::LEGAL_ORG_LABEL,
             self::LEGAL_PROPRIETOR => self::LEGAL_PROPRIETOR_LABEL
         ];
     }
@@ -114,26 +159,31 @@ class ApplicationFilingForm extends Model
     public static function typeLabels()
     {
         return [
-            self::TYPE_PASSPORT,
-            self::TYPE_FOREIGN_CITIZEN_PASSPORT,
-            self::TYPE_SAILOR_PASSPORT,
-            self::TYPE_IDENTIFICATION,
-            self::TYPE_IDENTIFICATION_SOLDIER,
-            self::TYPE_TEMPORARY_IDENTIFICATION,
-            self::TYPE_BIRTH_CERTIFICATE,
-            self::TYPE_MILITARY_ID,
-            self::TYPE_RESIDENT_VIEW,
-            self::TYPE_ANOTHER
+            self::TYPE_PASSPORT => self::TYPE_PASSPORT_LABEL,
+            self::TYPE_FOREIGN_PASS => self::TYPE_FOREIGN_PASS_LABEL,
+            self::TYPE_SAILOR_PASS => self::TYPE_SAILOR_PASS_LABEL,
+            self::TYPE_IDENTIFICATION => self::TYPE_IDENTIFICATION_LABEL,
+            self::TYPE_MILITARY_CARD => self::TYPE_MILITARY_CARD_LABEL,
+            self::TYPE_TEMPORARY_IDENTIFICATION => self::TYPE_TEMPORARY_IDENTIFICATION_LABEL,
+            self::TYPE_BIRTH_CERTIFICATE => self::TYPE_BIRTH_CERTIFICATE_LABEL,
+            self::TYPE_MILITARY_ID => self::TYPE_MILITARY_ID_LABEL,
+            self::TYPE_RESIDENT_VIEW => self::TYPE_RESIDENT_VIEW_LABEL,
+            self::TYPE_ANOTHER => self::TYPE_ANOTHER_LABEL
         ];
     }
 
     /**
      * @return false
      * @throws ErrorException
+     * @throws \yii\base\InvalidConfigException
      */
     public function registration()
     {
         $client = $this->sendClientRegistrationRequest();
+
+        if (!empty($client['message'])) {
+            throw new ErrorException($client['message']);
+        }
 
         $response = $this->sendDomainRegistrationRequest($client['id']);
 
@@ -159,10 +209,23 @@ class ApplicationFilingForm extends Model
 
     /**
      * @return mixed|null
+     * @throws \yii\base\InvalidConfigException
      */
     protected function sendClientRegistrationRequest()
     {
-        $birthday =!empty($this->toBirthString) ? (int)\Yii::$app->formatter->asTimestamp($this->toBirthString) : null;
+        $emails = [];
+        array_push($emails, $this->email1, $this->email2, $this->email3);
+        $emails = array_diff($emails, array(''));
+        $phones = explode(", ", $this->phones);
+        if (!empty($phones[0]) && strlen($phones[0]) != 14) {
+            throw new ErrorException('Не верно введен «Номер первого телефона».');
+        }
+        if (!empty($phones[1]) && strlen($phones[1]) != 14) {
+            throw new ErrorException('Не верно введен «Номер второго телефона».');
+        }
+        if (!empty($phones[2]) && strlen($phones[2]) != 14) {
+            throw new ErrorException('Не верно введен «Номер третьего телефона».');
+        }
 
         $clientFields = [
             'jsonrpc' => '2.0',
@@ -173,32 +236,79 @@ class ApplicationFilingForm extends Model
                     'login' => \Yii::$app->params['login'],
                     'password' => \Yii::$app->params['password'],
                 ],
-                "client" => [
+                'client' => [
                     'legal' => $this->legal,
                     'nameLocal' => $this->userName,
-                    'birthday' => $birthday,
-                    'identity' => [
-                        'type' => $this->type,
-                        'series' => $this->series,
-                        'number' => $this->number,
-                        'issuer' => $this->issuer,
-                        'issued' => $this->issued
-                    ],
-                    'emails' => [
-                        $this->email
-                    ],
-                    'phones' => [
-                        $this->phone
-                    ],
                     'addressLocal' => [
                         'index' => $this->index,
                         'country' => 'RU',
                         'city' => $this->city,
                         'street' => $this->street
-                    ]
+                    ],
+                    'emails' => $emails,
+                    'phones' => $phones
                 ],
             ],
         ];
+
+        if (!empty($this->inn)) {
+            $clientFields['params']['client']['inn'] = $this->inn;
+        }
+
+        if ($this->legal == self::LEGAL_PERSON || $this->legal == self::LEGAL_PROPRIETOR) {
+            $birthday = !empty($this->toBirthString) ? \Yii::$app->formatter->asDate($this->toBirthString, 'yyyy-MM-dd') : null;
+            $issued = !empty($this->toIssuedString) ? \Yii::$app->formatter->asDate($this->toIssuedString, 'yyyy-MM-dd') : null;
+
+            preg_match("/^[0-9A-ZА-ЯЁ]{1,10}\z/", $this->series, $series);
+            preg_match("/^\d{1,15}\z/", $this->number, $number);
+//            preg_match("/^[0-9a-zA-Zа-яёА-ЯЁ№\".,-]{3,128}\z/", $this->issuer, $issuer);
+
+            if (empty($series)) {
+                throw new ErrorException('Не верно введено поле «Серия».');
+            }
+
+            if (empty($number)) {
+                throw new ErrorException('Не верно введено поле «Номер».');
+            }
+
+//            if (empty($issuer)) {
+//                throw new ErrorException('Не верно введено поле «Кем выдан».');
+//            }
+
+            $clientFields['params']['client']['birthday'] = $birthday;
+            $clientFields['params']['client']['identity'] = [
+                'type' => $this->type,
+                'series' => $series[0],
+                'number' => $number[0],
+                'issuer' => $this->issuer,
+                'issued' => $issued
+            ];
+        }
+
+        if ($this->legal == self::LEGAL_ORG) {
+            $clientFields['params']['client']['addressLegal'] = [
+                'index' => $this->index,
+                'country' => 'RU',
+                'city' => $this->city,
+                'street' => $this->street
+            ];
+            $clientFields['params']['client']['kpp'] = $this->kpp;
+            $clientFields['params']['client']['okpo'] = $this->okpo;
+        }
+
+        if (!empty($this->faxes)) {
+            $faxes = explode(", ", $this->faxes);
+            if (!empty($faxes[0]) && strlen($faxes[0]) != 14) {
+                throw new ErrorException('Не верно введен «Номер первого факса».');
+            }
+            if (!empty($faxes[1]) && strlen($faxes[1]) != 14) {
+                throw new ErrorException('Не верно введен «Номер второго факса».');
+            }
+            if (!empty($faxes[2]) && strlen($faxes[2]) != 14) {
+                throw new ErrorException('Не верно введен «Номер третьего факса».');
+            }
+            $clientFields['params']['client']['faxes'] = $faxes;
+        }
 
         return ApiComponent::request($clientFields);
     }

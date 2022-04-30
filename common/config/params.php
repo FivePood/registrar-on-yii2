@@ -7,6 +7,7 @@ return [
     'user.passwordResetTokenExpire' => 3600,
     'user.passwordMinLength' => 8,
 
+    'uri' => 'https://vrdemo.virtreg.ru/vr-api',
     'login' => 'demo',
     'password' => 'demo',
 ];

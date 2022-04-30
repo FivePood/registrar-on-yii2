@@ -12,7 +12,7 @@ class ApiComponent extends Component
     public static function request($requestFields)
     {
         $client = new GuzzleHttp\Client();
-        $response = $client->post("https://vrdemo.virtreg.ru/vr-api", [
+        $response = $client->post(\Yii::$app->params['uri'], [
             'json' => $requestFields
         ]);
 
