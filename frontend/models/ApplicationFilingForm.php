@@ -86,7 +86,8 @@ class ApplicationFilingForm extends Model
             [['email1', 'email2', 'email3'], 'email'],
             [['toBirthString', 'toIssuedString'], 'safe'],
             [['period', 'inn', 'kpp', 'okpo'], 'integer'],
-            [['kpp', 'okpo'], 'string', 'min' => 9],
+            [['kpp'], 'string', 'min' => 9],
+            [['okpo'], 'string', 'min' => 8],
             ['noCheck', 'boolean'],
             [
                 ['type', 'series', 'number', 'issuer', 'toBirthString', 'toIssuedString'], 'required',
