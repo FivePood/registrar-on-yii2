@@ -93,10 +93,10 @@ class ApplicationFilingForm extends Model
             [
                 ['type', 'series', 'number', 'issuer', 'toBirthString', 'toIssuedString'], 'required',
                 'when' => function () {
-                    return ($this->legal == self::LEGAL_PERSON);
+                    return ($this->legal == self::LEGAL_PERSON || $this->legal == self::LEGAL_PROPRIETOR);
                 },
                 'whenClient' => 'function(attribute,value){
-                    return ($("#legal").val()=="person");
+                    return ($("#legal").val()=="person" || $("#legal").val()=="proprietor");
                 }',
             ],
             [
