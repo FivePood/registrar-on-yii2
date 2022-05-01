@@ -77,7 +77,7 @@ class ApplicationFilingForm extends Model
     public function rules()
     {
         return [
-            [['legal', 'userName', 'index', 'city', 'street', 'domainName', 'email1', 'phones'], 'required'],
+            [['legal', 'userName', 'city', 'street', 'domainName', 'email1', 'phones'], 'required'],
             [['userName', 'legal',
                 'type', 'series', 'number', 'issuer',
                 'index', 'city', 'street',
@@ -85,7 +85,8 @@ class ApplicationFilingForm extends Model
                 'domainName', 'vendorId', 'authCode'], 'string', 'max' => 255],
             [['email1', 'email2', 'email3'], 'email'],
             [['toBirthString', 'toIssuedString'], 'safe'],
-            [['period', 'inn', 'kpp', 'okpo'], 'integer'],
+            [['period', 'inn'], 'integer'],
+            [['index'], 'string', 'min' => 6],
             [['kpp'], 'string', 'min' => 9],
             [['okpo'], 'string', 'min' => 8],
             ['noCheck', 'boolean'],
@@ -123,9 +124,9 @@ class ApplicationFilingForm extends Model
             'series' => 'Серия',
             'number' => 'Номер',
             'issuer' => 'Кем выдан',
-            'email1' => 'E-mail',
-            'email2' => 'E-mail',
-            'email3' => 'E-mail',
+            'email1' => 'Список адресов E-mail',
+            'email2' => 'Список адресов E-mail',
+            'email3' => 'Список адресов E-mail',
             'phones' => 'Список номеров телефонов',
             'faxes' => 'Список номеров факсов',
             'index' => 'Почтовый индекс',
@@ -262,7 +263,7 @@ class ApplicationFilingForm extends Model
 
             preg_match("/^[0-9A-ZА-ЯЁ]{1,10}\z/", $this->series, $series);
             preg_match("/^\d{1,15}\z/", $this->number, $number);
-//            preg_match("/^[0-9a-zA-Zа-яёА-ЯЁ№\".,-]{3,128}\z/", $this->issuer, $issuer);
+            preg_match("/^\w{3,128}\z/", $this->issuer, $issuer);
 
             if (empty($series)) {
                 throw new ErrorException('Не верно введено поле «Серия».');
@@ -272,16 +273,16 @@ class ApplicationFilingForm extends Model
                 throw new ErrorException('Не верно введено поле «Номер».');
             }
 
-//            if (empty($issuer)) {
-//                throw new ErrorException('Не верно введено поле «Кем выдан».');
-//            }
+            if (empty($issuer)) {
+                throw new ErrorException('Не верно введено поле «Кем выдан».');
+            }
 
             $clientFields['params']['client']['birthday'] = $birthday;
             $clientFields['params']['client']['identity'] = [
                 'type' => $this->type,
                 'series' => $series[0],
                 'number' => $number[0],
-                'issuer' => $this->issuer,
+                'issuer' => $issuer,
                 'issued' => $issued
             ];
         }

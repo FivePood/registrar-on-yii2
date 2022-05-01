@@ -105,7 +105,6 @@ use kartik\date\DatePicker;
             'pluginOptions' => [
                 'autoClose' => true,
                 'startDate' => \Yii::$app->formatter->asDate('1900-01-01'),
-                'endDate' => \Yii::$app->formatter->asDate(time()),
                 'initialize' => true,
                 'allowClear' => false,
             ],
@@ -117,7 +116,6 @@ use kartik\date\DatePicker;
             'pluginOptions' => [
                 'autoClose' => true,
                 'startDate' => \Yii::$app->formatter->asDate('1900-01-01'),
-                'endDate' => \Yii::$app->formatter->asDate(time()),
                 'initialize' => true,
                 'allowClear' => false,
             ],
@@ -127,15 +125,19 @@ use kartik\date\DatePicker;
     <?= $form->field($model, 'issuer', ['options' => ['style' => 'margin-top: 10px', 'id' => 'issuer-field']])->textInput(['maxlength' => 255]) ?>
 
     <div class="row" style='margin-top: 10px'>
-        <?= $form->field($model, 'index', ['options' => ['class' => 'col-lg-4']])->textInput(['maxlength' => 255]) ?>
+        <?= $form->field($model, 'index', ['options' => ['class' => 'col-lg-4']])->widget(MaskedInput::className(), [
+            'mask' => '[[9]{1,6}]',
+            'clientOptions' => ['greedy' => false],
+        ]) ?>
         <?= $form->field($model, 'city', ['options' => ['class' => 'col-lg-4']])->textInput(['maxlength' => 255]) ?>
         <?= $form->field($model, 'street', ['options' => ['class' => 'col-lg-4']])->textInput(['maxlength' => 255]) ?>
     </div>
 
-    <div class="row" style='margin-top: 10px'>
-        <?= $form->field($model, 'email1', ['options' => ['class' => 'col-lg-4']])->textInput(['maxlength' => 255]) ?>
-        <?= $form->field($model, 'email2', ['options' => ['class' => 'col-lg-4']])->textInput(['maxlength' => 255]) ?>
-        <?= $form->field($model, 'email3', ['options' => ['class' => 'col-lg-4']])->textInput(['maxlength' => 255]) ?>
+    <p style='margin: 10px 0'>Список адресов E-mail</p>
+    <div class="row">
+        <?= $form->field($model, 'email1', ['options' => ['class' => 'col-lg-4']])->textInput(['maxlength' => 255])->label(false) ?>
+        <?= $form->field($model, 'email2', ['options' => ['class' => 'col-lg-4']])->textInput(['maxlength' => 255])->label(false) ?>
+        <?= $form->field($model, 'email3', ['options' => ['class' => 'col-lg-4']])->textInput(['maxlength' => 255])->label(false) ?>
     </div>
 
     <div class="row" style='margin-top: 10px'>
