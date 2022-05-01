@@ -77,10 +77,10 @@ class ApplicationFilingForm extends Model
     public function rules()
     {
         return [
-            [['legal', 'userName', 'city', 'street', 'domainName', 'email1', 'phones'], 'required'],
+            [['legal', 'userName', 'index', 'city', 'street', 'domainName', 'email1', 'phones'], 'required'],
             [['userName', 'legal',
                 'type', 'series', 'number', 'issuer',
-                'index', 'city', 'street',
+                'city', 'street',
                 'phones', 'faxes',
                 'domainName', 'vendorId', 'authCode'], 'string', 'max' => 255],
             [['email1', 'email2', 'email3'], 'email'],
@@ -220,13 +220,13 @@ class ApplicationFilingForm extends Model
         $emails = array_diff($emails, array(''));
         $phones = explode(", ", $this->phones);
         if (!empty($phones[0]) && strlen($phones[0]) != 14) {
-            throw new ErrorException('Не верно введен «Номер первого телефона».');
+            $this->addError('', 'Не верно введено «Номер первого телефона».');
         }
         if (!empty($phones[1]) && strlen($phones[1]) != 14) {
-            throw new ErrorException('Не верно введен «Номер второго телефона».');
+            $this->addError('', 'Не верно введено «Номер второго телефона».');
         }
         if (!empty($phones[2]) && strlen($phones[2]) != 14) {
-            throw new ErrorException('Не верно введен «Номер третьего телефона».');
+            $this->addError('', 'Не верно введено «Номер третьего телефона».');
         }
 
         $clientFields = [
@@ -261,20 +261,20 @@ class ApplicationFilingForm extends Model
             $birthday = !empty($this->toBirthString) ? \Yii::$app->formatter->asDate($this->toBirthString, 'yyyy-MM-dd') : null;
             $issued = !empty($this->toIssuedString) ? \Yii::$app->formatter->asDate($this->toIssuedString, 'yyyy-MM-dd') : null;
 
-            preg_match("/^[0-9A-ZА-ЯЁ]{1,10}\z/", $this->series, $series);
+            preg_match("/^[0-9A-ZА-ЯЁ]{1,10}\z/ui", $this->series, $series);
             preg_match("/^\d{1,15}\z/", $this->number, $number);
-            preg_match("/^\w{3,128}\z/", $this->issuer, $issuer);
+            preg_match("/^(?!-)[A-ZА-ЯЁa-zа-яё0-9-_/+'. ]{1,128}(?)/ui", $this->issuer, $issuer);
 
             if (empty($series)) {
-                throw new ErrorException('Не верно введено поле «Серия».');
+                $this->addError('', 'Не верно введено «Серия».');
             }
 
             if (empty($number)) {
-                throw new ErrorException('Не верно введено поле «Номер».');
+                $this->addError('', 'Не верно введено «Номер».');
             }
 
             if (empty($issuer)) {
-                throw new ErrorException('Не верно введено поле «Кем выдан».');
+                $this->addError('', 'Не верно введено «Кем выдан».');
             }
 
             $clientFields['params']['client']['birthday'] = $birthday;
@@ -282,7 +282,7 @@ class ApplicationFilingForm extends Model
                 'type' => $this->type,
                 'series' => $series[0],
                 'number' => $number[0],
-                'issuer' => $issuer,
+                'issuer' => $issuer[0],
                 'issued' => $issued
             ];
         }
@@ -301,15 +301,21 @@ class ApplicationFilingForm extends Model
         if (!empty($this->faxes)) {
             $faxes = explode(", ", $this->faxes);
             if (!empty($faxes[0]) && strlen($faxes[0]) != 14) {
-                throw new ErrorException('Не верно введен «Номер первого факса».');
+                $this->addError('', 'Не верно введено «Номер первого факса».');
             }
             if (!empty($faxes[1]) && strlen($faxes[1]) != 14) {
-                throw new ErrorException('Не верно введен «Номер второго факса».');
+                $this->addError('', 'Не верно введено «Номер второго факса».');
             }
             if (!empty($faxes[2]) && strlen($faxes[2]) != 14) {
-                throw new ErrorException('Не верно введен «Номер третьего факса».');
+                $this->addError('', 'Не верно введено «Номер третьего факса».');
             }
             $clientFields['params']['client']['faxes'] = $faxes;
+        }
+
+        $errors = $this->getErrors();
+
+        if (!empty($errors)) {
+            throw new ErrorException(implode('<br>', $errors[""]));
         }
 
         return ApiComponent::request($clientFields);

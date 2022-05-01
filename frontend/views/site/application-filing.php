@@ -143,11 +143,9 @@ use kartik\date\DatePicker;
     <div class="row" style='margin-top: 10px'>
         <?= $form->field($model, 'phones', ['options' => ['class' => 'col-lg-6']])->widget(MaskedInput::className(), [
             'mask' => '[+7 999 9999999, +7 999 9999999, +7 999 9999999]',
-            'clientOptions' => ['greedy' => false],
         ]) ?>
         <?= $form->field($model, 'faxes', ['options' => ['class' => 'col-lg-6']])->widget(MaskedInput::className(), [
             'mask' => '[+7 999 9999999, +7 999 9999999, +7 999 9999999]',
-            'clientOptions' => ['greedy' => false],
         ]) ?>
     </div>
 
