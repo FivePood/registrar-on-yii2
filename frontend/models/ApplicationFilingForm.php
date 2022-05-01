@@ -3,6 +3,7 @@
 namespace frontend\models;
 
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\base\ErrorException;
 use common\models\Domain;
@@ -177,7 +178,7 @@ class ApplicationFilingForm extends Model
     /**
      * @return false
      * @throws ErrorException
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function registration()
     {
@@ -211,7 +212,8 @@ class ApplicationFilingForm extends Model
 
     /**
      * @return mixed|null
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
+     * @throws ErrorException
      */
     protected function sendClientRegistrationRequest()
     {

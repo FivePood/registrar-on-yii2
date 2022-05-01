@@ -9,7 +9,7 @@ use kartik\date\DatePicker;
 
 /** @var yii\web\View $this */
 /** @var yii\bootstrap4\ActiveForm $form */
-/** @var \frontend\models\ApplicationFilingForm $model */
+/** @var ApplicationFilingForm $model */
 ?>
 <div class="site-application-filing">
     <h1><?= Html::encode($this->title) ?></h1>
