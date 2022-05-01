@@ -97,10 +97,10 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 
             try {
-                if ($model->sendRequest()) {
-                    Yii::$app->session->setFlash('success', 'Запрос на обновления DNS для домена успешно отправлен.');
+                if ($model->update()) {
+                    Yii::$app->session->setFlash('success', 'DNS успешно обновлен.');
                 } else {
-                    Yii::$app->session->setFlash('error', 'Не удалось отправить запрос на обновления DNS для домена.');
+                    Yii::$app->session->setFlash('error', 'Не удалось отправить запрос на обновление DNS.');
                 }
             } catch (ErrorException $e) {
                 Yii::$app->session->setFlash('error', $e->getMessage());

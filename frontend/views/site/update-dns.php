@@ -15,24 +15,26 @@ use yii\widgets\MaskedInput;
 
     <?php $form = ActiveForm::begin(['id' => 'update-dns-form']); ?>
 
-    <?= $form->field($model, 'clientId')->widget(MaskedInput::className(), [
-        'mask' => '[[9]{1,10}]',
-        'clientOptions' => ['greedy' => false],
-        'options' => ['placeholder' => ''],
-    ]) ?>
-
-    <?= $form->field($model, 'domainId')->widget(MaskedInput::className(), [
-        'mask' => '[[9]{1,10}]',
-        'clientOptions' => ['greedy' => false],
-        'options' => ['placeholder' => ''],
-    ]) ?>
-
-    <?= $form->field($model, 'dnskey')->textInput(['maxlength' => 255]) ?>
-
-    <div class="form-group">
-        <?= Html::submitButton('Обновить DNS', ['class' => 'btn btn-primary', 'name' => 'update-dns-button']) ?>
+    <div class="row" style='margin-bottom: 10px'>
+        <?= $form->field($model, 'clientId', ['options' => ['class' => 'col-lg-6']])->widget(MaskedInput::className(), [
+            'mask' => '[[9]{1,10}]',
+            'clientOptions' => ['greedy' => false]
+        ]) ?>
+        <?= $form->field($model, 'domainId', ['options' => ['class' => 'col-lg-6']])->widget(MaskedInput::className(), [
+            'mask' => '[[9]{1,10}]',
+            'clientOptions' => ['greedy' => false]
+        ]) ?>
     </div>
 
+    <?= $form->field($model, 'dns')->textInput(['maxlength' => 255]) ?>
+
+    <div class="form-group">
+        <?= Html::submitButton('Обновить DNS', [
+            'class' => 'btn btn-outline-dark btn-block',
+            'style' => 'margin-top: 20px',
+            'name' => 'update-dns-button'
+        ]) ?>
+    </div>
     <?php ActiveForm::end(); ?>
 
 </div>

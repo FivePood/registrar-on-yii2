@@ -15,7 +15,7 @@ class UpdateDnsForm extends Model
 {
     public $clientId;
     public $domainId;
-    public $dnskey;
+    public $dns;
 
     /**
      * {@inheritdoc}
@@ -23,9 +23,9 @@ class UpdateDnsForm extends Model
     public function rules()
     {
         return [
-            [['domainId', 'dnskey', 'clientId'], 'required'],
-            [['domainId', 'clientId'], 'integer'],
-            ['dnskey', 'string'],
+            [['clientId', 'domainId', 'dns'], 'required'],
+            [['clientId', 'domainId'], 'integer'],
+            ['dns', 'string'],
         ];
     }
 
@@ -37,34 +37,28 @@ class UpdateDnsForm extends Model
         return [
             'clientId' => 'Идентификатор клиента',
             'domainId' => 'Идентификатор домена',
-            'dnskey' => 'Запись DNSKEY',
+            'dns' => 'DNS',
         ];
     }
 
+
     /**
-     * {@inheritdoc}
+     * @return bool
      * @throws ErrorException
      */
-    public function sendRequest()
+    public function update()
     {
-        $requestFields = [
-            'jsonrpc' => '2.0',
-            'id' => '',
-            'method' => 'domainDnssec',
-            'params' => [
-                'auth' => [
-                    'login' => \Yii::$app->params['login'],
-                    'password' => \Yii::$app->params['password'],
-                ],
-                'id' => (int)$this->domainId,
-                'clientId' => (int)$this->clientId,
-                'dnssec' => ['dnssec' => $this->dnskey],
-            ],
-        ];
+        $domainInfo = $this->getDomainInfo();
 
-        Yii::debug($requestFields);
+        if (!empty($domainInfo['message'])) {
+            throw new ErrorException($domainInfo['message']);
+        }
 
-        $response = ApiComponent::request($requestFields);
+        if (empty($domainInfo['domain']['name'])) {
+            throw new ErrorException('Ошибка при получении имени домена.');
+        }
+
+        $response = $this->sendDomainDNS($domainInfo['domain']['name']);
 
         if (!empty($response['message'])) {
             throw new ErrorException($response['message']);
@@ -75,7 +69,7 @@ class UpdateDnsForm extends Model
         }
 
         $domain = new Domain();
-        $domain->name = null;
+        $domain->name = $domainInfo['domain']['name'];
         $domain->registeredId = $response['id'];
         $domain->handle = $response['handle'];
         $domain->comment = 'Обновление DNS';
@@ -84,5 +78,59 @@ class UpdateDnsForm extends Model
         $domain->save();
 
         return true;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getDomainInfo()
+    {
+        $requestFields = [
+            'jsonrpc' => '2.0',
+            'id' => '',
+            'method' => 'domainInfo',
+            'params' => [
+                'auth' => [
+                    'login' => \Yii::$app->params['login'],
+                    'password' => \Yii::$app->params['password'],
+                ],
+                'id' => (int)$this->domainId
+            ],
+        ];
+
+        Yii::debug($requestFields);
+
+        return ApiComponent::request($requestFields);
+    }
+
+    /**
+     * @param $domainName
+     * @return mixed|null
+     */
+    public function sendDomainDNS($domainName)
+    {
+        $newDns[] = $domainName . ' ' . $this->dns;
+
+        $requestFields = [
+            'jsonrpc' => '2.0',
+            'id' => '',
+            'method' => 'domainUpdate',
+            'params' => [
+                'auth' => [
+                    'login' => \Yii::$app->params['login'],
+                    'password' => \Yii::$app->params['password'],
+                ],
+                'id' => (int)$this->domainId,
+                'clientId' => (int)$this->clientId,
+                'domain' => [
+                    'nservers' => $newDns,
+                    'delegated' => 0
+                ],
+            ],
+        ];
+
+        Yii::debug($requestFields);
+
+        return ApiComponent::request($requestFields);
     }
 }

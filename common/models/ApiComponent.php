@@ -35,12 +35,12 @@ class ApiComponent extends Component
             return $array['error'];
         }
 
-        if (empty($array['result']['handle'])) {
+        if (empty($array['result']['domain']) && empty($array['result']['handle'])) {
             Yii::error('Empty handle');
             return null;
         }
 
-        if (empty($array['result']['id'])) {
+        if (empty($array['result']['domain']) && empty($array['result']['id'])) {
             Yii::error('Empty id');
             return null;
         }
