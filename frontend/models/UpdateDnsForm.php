@@ -13,7 +13,6 @@ use common\models\ApiComponent;
  */
 class UpdateDnsForm extends Model
 {
-    public $clientId;
     public $domainId;
     public $dns;
 
@@ -23,8 +22,8 @@ class UpdateDnsForm extends Model
     public function rules()
     {
         return [
-            [['clientId', 'domainId', 'dns'], 'required'],
-            [['clientId', 'domainId'], 'integer'],
+            [['domainId', 'dns'], 'required'],
+            [['domainId'], 'integer'],
             ['dns', 'string'],
         ];
     }
@@ -35,7 +34,6 @@ class UpdateDnsForm extends Model
     public function attributeLabels()
     {
         return [
-            'clientId' => 'Идентификатор клиента',
             'domainId' => 'Идентификатор домена',
             'dns' => 'DNS',
         ];
@@ -58,7 +56,7 @@ class UpdateDnsForm extends Model
             throw new ErrorException('Ошибка при получении имени домена.');
         }
 
-        $response = $this->sendDomainDNS($domainInfo['domain']['name']);
+        $response = $this->sendDomainDNS($domainInfo['domain']['name'], $domainInfo['domain']['clientId']);
 
         if (!empty($response['message'])) {
             throw new ErrorException($response['message']);
@@ -107,7 +105,7 @@ class UpdateDnsForm extends Model
      * @param $domainName
      * @return mixed|null
      */
-    public function sendDomainDNS($domainName)
+    public function sendDomainDNS($domainName, $clientId)
     {
         $newDns[] = $domainName . ' ' . $this->dns;
 
@@ -121,7 +119,7 @@ class UpdateDnsForm extends Model
                     'password' => \Yii::$app->params['password'],
                 ],
                 'id' => (int)$this->domainId,
-                'clientId' => (int)$this->clientId,
+                'clientId' => (int)$clientId,
                 'domain' => [
                     'nservers' => $newDns,
                     'delegated' => 0

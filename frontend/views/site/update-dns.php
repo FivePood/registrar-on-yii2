@@ -16,17 +16,14 @@ use yii\widgets\MaskedInput;
     <?php $form = ActiveForm::begin(['id' => 'update-dns-form']); ?>
 
     <div class="row" style='margin-bottom: 10px'>
-        <?= $form->field($model, 'clientId', ['options' => ['class' => 'col-lg-6']])->widget(MaskedInput::className(), [
+        <?= $form->field($model, 'domainId', ['options' => ['class' => 'col-lg-3']])->widget(MaskedInput::className(), [
             'mask' => '[[9]{1,10}]',
             'clientOptions' => ['greedy' => false]
         ]) ?>
-        <?= $form->field($model, 'domainId', ['options' => ['class' => 'col-lg-6']])->widget(MaskedInput::className(), [
-            'mask' => '[[9]{1,10}]',
-            'clientOptions' => ['greedy' => false]
-        ]) ?>
+
+        <?= $form->field($model, 'dns', ['options' => ['class' => 'col-lg-9']])->textInput(['maxlength' => 255]) ?>
     </div>
 
-    <?= $form->field($model, 'dns')->textInput(['maxlength' => 255]) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Обновить DNS', [
