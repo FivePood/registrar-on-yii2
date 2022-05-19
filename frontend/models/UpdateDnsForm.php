@@ -5,6 +5,7 @@ namespace frontend\models;
 use Yii;
 use yii\base\Model;
 use yii\base\ErrorException;
+use GuzzleHttp\Exception\GuzzleException;
 use common\models\Domain;
 use common\models\ApiComponent;
 
@@ -39,10 +40,10 @@ class UpdateDnsForm extends Model
         ];
     }
 
-
     /**
      * @return bool
      * @throws ErrorException
+     * @throws GuzzleException
      */
     public function update()
     {
@@ -80,6 +81,7 @@ class UpdateDnsForm extends Model
 
     /**
      * @return mixed|null
+     * @throws GuzzleException
      */
     public function getDomainInfo()
     {
@@ -103,7 +105,9 @@ class UpdateDnsForm extends Model
 
     /**
      * @param $domainName
+     * @param $clientId
      * @return mixed|null
+     * @throws GuzzleException
      */
     public function sendDomainDNS($domainName, $clientId)
     {

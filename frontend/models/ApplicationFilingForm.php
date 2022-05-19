@@ -3,9 +3,10 @@
 namespace frontend\models;
 
 use Yii;
-use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\base\ErrorException;
+use yii\base\InvalidConfigException;
+use GuzzleHttp\Exception\GuzzleException;
 use common\models\Domain;
 use common\models\ApiComponent;
 
@@ -178,7 +179,7 @@ class ApplicationFilingForm extends Model
     /**
      * @return false
      * @throws ErrorException
-     * @throws InvalidConfigException
+     * @throws InvalidConfigException|GuzzleException
      */
     public function registration()
     {
@@ -214,6 +215,7 @@ class ApplicationFilingForm extends Model
      * @return mixed|null
      * @throws InvalidConfigException
      * @throws ErrorException
+     * @throws GuzzleException
      */
     protected function sendClientRegistrationRequest()
     {
@@ -265,7 +267,7 @@ class ApplicationFilingForm extends Model
 
             preg_match("/^[0-9A-ZА-ЯЁ]{1,10}\z/ui", $this->series, $series);
             preg_match("/^\d{1,15}\z/", $this->number, $number);
-            preg_match("/^(?!-)[A-ZА-ЯЁa-zа-яё0-9-_/+'. ]{1,128}(?)/ui", $this->issuer, $issuer);
+            preg_match("/^(?!-)[A-ZА-ЯЁa-zа-яё0-9-_+'. ]{1,128}(?)/ui", $this->issuer, $issuer);
 
             if (empty($series)) {
                 $this->addError('', 'Не верно введено «Серия».');
@@ -326,7 +328,7 @@ class ApplicationFilingForm extends Model
     /**
      * @param null $clientId
      * @return mixed|null
-     * @throws ErrorException
+     * @throws ErrorException|GuzzleException
      */
     public function sendDomainRegistrationRequest($clientId = null)
     {

@@ -9,6 +9,9 @@ use GuzzleHttp;
 
 class ApiComponent extends Component
 {
+    /**
+     * @throws GuzzleHttp\Exception\GuzzleException
+     */
     public static function request($requestFields)
     {
         $client = new GuzzleHttp\Client();
