@@ -11,7 +11,7 @@ use GuzzleHttp;
 class ApiComponent extends Component
 {
     /**
-     * @throws GuzzleException
+     * @throws GuzzleHttp\Exception\GuzzleException
      */
     public static function request($requestFields)
     {
