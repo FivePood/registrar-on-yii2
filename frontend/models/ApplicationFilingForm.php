@@ -2,16 +2,15 @@
 
 namespace frontend\models;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\base\ErrorException;
 use common\models\Domain;
 use common\models\ApiComponent;
+use yii\db\Exception;
 
-/**
- * ApplicationFilingForm is the model behind the Application Filing form.
- */
 class ApplicationFilingForm extends Model
 {
     public $userName;
@@ -72,10 +71,7 @@ class ApplicationFilingForm extends Model
     const TYPE_RESIDENT_VIEW_LABEL = 'Вид на жительство';
     const TYPE_ANOTHER_LABEL = 'Другой';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['legal', 'userName', 'index', 'city', 'street', 'domainName', 'email1', 'phones'], 'required'],
@@ -112,10 +108,7 @@ class ApplicationFilingForm extends Model
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'legal' => 'Юридический статус',
@@ -147,7 +140,7 @@ class ApplicationFilingForm extends Model
     /**
      * @return string[]
      */
-    public static function legalLabels()
+    public static function legalLabels(): array
     {
         return [
             self::LEGAL_PERSON => self::LEGAL_PERSON_LABEL,
@@ -159,7 +152,7 @@ class ApplicationFilingForm extends Model
     /**
      * @return string[]
      */
-    public static function typeLabels()
+    public static function typeLabels(): array
     {
         return [
             self::TYPE_PASSPORT => self::TYPE_PASSPORT_LABEL,
@@ -176,11 +169,12 @@ class ApplicationFilingForm extends Model
     }
 
     /**
-     * @return false
+     * @return string
      * @throws ErrorException
      * @throws InvalidConfigException
+     * @throws Exception|GuzzleException
      */
-    public function registration()
+    public function registration(): string
     {
         $client = $this->sendClientRegistrationRequest();
 
@@ -213,9 +207,9 @@ class ApplicationFilingForm extends Model
     /**
      * @return mixed|null
      * @throws InvalidConfigException
-     * @throws ErrorException
+     * @throws ErrorException|GuzzleException
      */
-    protected function sendClientRegistrationRequest()
+    protected function sendClientRegistrationRequest(): mixed
     {
         $emails = [];
         array_push($emails, $this->email1, $this->email2, $this->email3);
@@ -265,7 +259,7 @@ class ApplicationFilingForm extends Model
 
             preg_match("/^[0-9A-ZА-ЯЁ]{1,10}\z/ui", $this->series, $series);
             preg_match("/^\d{1,15}\z/", $this->number, $number);
-            preg_match("/^(?!-)[A-ZА-ЯЁa-zа-яё0-9-_/+'. ]{1,128}(?)/ui", $this->issuer, $issuer);
+            preg_match("/^(?!-)[A-ZА-яЁa-zё0-9-_'. ]{1,128}(?)/ui", $this->issuer, $issuer);
 
             if (empty($series)) {
                 $this->addError('', 'Не верно введено «Серия».');
@@ -326,9 +320,9 @@ class ApplicationFilingForm extends Model
     /**
      * @param null $clientId
      * @return mixed|null
-     * @throws ErrorException
+     * @throws ErrorException|GuzzleException
      */
-    public function sendDomainRegistrationRequest($clientId = null)
+    public function sendDomainRegistrationRequest($clientId = null): mixed
     {
         if (is_null($clientId)) {
             throw new ErrorException('Не удалось отправить запрос на регистрацию домена.');

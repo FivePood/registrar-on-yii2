@@ -2,23 +2,21 @@
 
 namespace frontend\controllers;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Yii;
 use yii\base\ErrorException;
+use yii\base\InvalidConfigException;
+use yii\db\Exception;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use frontend\models\UpdateDnsForm;
 use frontend\models\ApplicationFilingForm;
+use yii\web\Response;
 
-/**
- * Site controller
- */
 class SiteController extends Controller
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -46,10 +44,7 @@ class SiteController extends Controller
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function actions()
+    public function actions(): array
     {
         return [
             'error' => [
@@ -64,8 +59,10 @@ class SiteController extends Controller
 
     /**
      * @return string
+     * @throws InvalidConfigException
+     * @throws Exception|GuzzleException
      */
-    public function actionApplicationFiling()
+    public function actionApplicationFiling(): string
     {
         $model = new ApplicationFilingForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
@@ -89,9 +86,10 @@ class SiteController extends Controller
     }
 
     /**
-     * @return string|\yii\web\Response
+     * @return string|Response
+     * @throws Exception
      */
-    public function actionUpdateDns()
+    public function actionUpdateDns(): Response|string
     {
         $model = new UpdateDnsForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {

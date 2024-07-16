@@ -2,7 +2,7 @@
 
 namespace common\models;
 
-use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "domain".
@@ -15,20 +15,14 @@ use Yii;
  * @property int|null $createdAt
  * @property int|null $updatedAt
  */
-class Domain extends \yii\db\ActiveRecord
+class Domain extends ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'domain';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['registeredId', 'createdAt', 'updatedAt'], 'integer'],
@@ -36,10 +30,7 @@ class Domain extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'domainId' => 'ID',

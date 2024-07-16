@@ -2,24 +2,20 @@
 
 namespace frontend\models;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Yii;
 use yii\base\Model;
 use yii\base\ErrorException;
 use common\models\Domain;
 use common\models\ApiComponent;
+use yii\db\Exception;
 
-/**
- * UpdateDnsForm is the model behind the Update Dns form.
- */
 class UpdateDnsForm extends Model
 {
     public $domainId;
     public $dns;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['domainId', 'dns'], 'required'],
@@ -28,10 +24,7 @@ class UpdateDnsForm extends Model
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'domainId' => 'Идентификатор домена',
@@ -43,8 +36,9 @@ class UpdateDnsForm extends Model
     /**
      * @return bool
      * @throws ErrorException
+     * @throws Exception
      */
-    public function update()
+    public function update(): bool
     {
         $domainInfo = $this->getDomainInfo();
 
@@ -80,8 +74,9 @@ class UpdateDnsForm extends Model
 
     /**
      * @return mixed|null
+     * @throws GuzzleException
      */
-    public function getDomainInfo()
+    public function getDomainInfo(): mixed
     {
         $requestFields = [
             'jsonrpc' => '2.0',
@@ -103,9 +98,11 @@ class UpdateDnsForm extends Model
 
     /**
      * @param $domainName
+     * @param $clientId
      * @return mixed|null
+     * @throws GuzzleException
      */
-    public function sendDomainDNS($domainName, $clientId)
+    public function sendDomainDNS($domainName, $clientId): mixed
     {
         $newDns[] = $domainName . ' ' . $this->dns;
 

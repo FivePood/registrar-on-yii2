@@ -1,8 +1,5 @@
 <?php
 
-/** @var \yii\web\View $this */
-/** @var string $content */
-
 use common\widgets\Alert;
 use frontend\assets\AppAsset;
 use yii\bootstrap4\Breadcrumbs;
@@ -10,6 +7,10 @@ use yii\bootstrap4\Html;
 use yii\bootstrap4\Nav;
 use yii\bootstrap4\NavBar;
 use kartik\icons\FontAwesomeAsset;
+use yii\web\View;
+
+/** @var View $this */
+/** @var string $content */
 
 FontAwesomeAsset::register($this);
 AppAsset::register($this);
@@ -51,18 +52,12 @@ AppAsset::register($this);
 <main role="main" class="flex-shrink-0">
     <div class="container">
         <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+            'links' => $this->params['breadcrumbs'] ?? [],
         ]) ?>
         <?= Alert::widget() ?>
         <?= $content ?>
     </div>
 </main>
-
-<!--<footer class="footer mt-auto py-3 text-muted">-->
-<!--    <div class="container">-->
-<!--        <p class="float-left">&copy; --><?//= Html::encode(Yii::$app->name) ?><!-- --><?//= date('Y') ?><!--</p>-->
-<!--    </div>-->
-<!--</footer>-->
 
 <?php $this->endBody() ?>
 </body>

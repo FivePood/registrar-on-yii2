@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Yii;
 use yii\helpers\Json;
 use yii\base\Component;
@@ -9,6 +10,9 @@ use GuzzleHttp;
 
 class ApiComponent extends Component
 {
+    /**
+     * @throws GuzzleException
+     */
     public static function request($requestFields)
     {
         $client = new GuzzleHttp\Client();

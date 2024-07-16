@@ -48,7 +48,7 @@ class Alert extends \yii\bootstrap4\Widget
     /**
      * {@inheritdoc}
      */
-    public function run()
+    public function run(): void
     {
         $session = Yii::$app->session;
         $flashes = $session->getAllFlashes();

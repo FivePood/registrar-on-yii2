@@ -1,14 +1,13 @@
 <?php
 
-/** @var yii\web\View $this */
-/** @var yii\bootstrap4\ActiveForm $form */
-
-/** @var \frontend\models\UpdateDnsForm $model */
-
+use frontend\models\UpdateDnsForm;
 use yii\bootstrap4\Html;
 use yii\bootstrap4\ActiveForm;
 use yii\widgets\MaskedInput;
 
+/** @var yii\web\View $this */
+/** @var yii\bootstrap4\ActiveForm $form */
+/** @var UpdateDnsForm $model */
 ?>
 <div class="site-update-dns">
     <h1><?= Html::encode($this->title) ?></h1>

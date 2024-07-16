@@ -181,7 +181,7 @@ $legalOrg = ApplicationFilingForm::LEGAL_ORG;
 $js = <<<JS
 var legalOrg = $legalOrg;
 $(document).ready(function () {
-    if ($('#legal').val() == legalOrg) {
+    if ($('#legal').val() === legalOrg) {
         $('#issuer-field').show();
         $('#document-field').show();
         $('#type-field').show();
