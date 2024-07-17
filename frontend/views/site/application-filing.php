@@ -104,7 +104,6 @@ use kartik\date\DatePicker;
             'data' => $model->toBirthString,
             'pluginOptions' => [
                 'autoClose' => true,
-                'startDate' => \Yii::$app->formatter->asDate('1900-01-01'),
                 'initialize' => true,
                 'allowClear' => false,
             ],
@@ -115,7 +114,6 @@ use kartik\date\DatePicker;
             'data' => $model->toIssuedString,
             'pluginOptions' => [
                 'autoClose' => true,
-                'startDate' => \Yii::$app->formatter->asDate('1900-01-01'),
                 'initialize' => true,
                 'allowClear' => false,
             ],
