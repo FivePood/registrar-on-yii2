@@ -2,11 +2,10 @@
 
 namespace common\models;
 
-use GuzzleHttp\Exception\GuzzleException;
-use Yii;
-use yii\helpers\Json;
-use yii\base\Component;
 use GuzzleHttp;
+use Yii;
+use yii\base\Component;
+use yii\helpers\Json;
 
 class ApiComponent extends Component
 {

@@ -5,8 +5,6 @@ namespace common\models;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "domain".
- *
  * @property int $domainId
  * @property string|null $name
  * @property int|null $registeredId
@@ -36,9 +34,9 @@ class Domain extends ActiveRecord
             'domainId' => 'ID',
             'name' => 'Имя домена',
             'registeredId' => 'Идентификатор домена',
-            'handle' => 'дескриптор операции',
+            'handle' => 'Дескриптор операции',
             'comment' => 'Комментарий операции',
-            'createdAt' => 'Дата создания ',
+            'createdAt' => 'Дата создания',
             'updatedAt' => 'Дата обновления',
         ];
     }

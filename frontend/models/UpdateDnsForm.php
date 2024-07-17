@@ -36,7 +36,7 @@ class UpdateDnsForm extends Model
     /**
      * @return bool
      * @throws ErrorException
-     * @throws Exception
+     * @throws Exception|GuzzleException
      */
     public function update(): bool
     {

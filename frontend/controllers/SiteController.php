@@ -87,7 +87,7 @@ class SiteController extends Controller
 
     /**
      * @return string|Response
-     * @throws Exception
+     * @throws Exception|GuzzleException
      */
     public function actionUpdateDns(): Response|string
     {

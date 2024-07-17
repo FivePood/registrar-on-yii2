@@ -2,13 +2,13 @@
 
 namespace frontend\models;
 
+use common\models\Domain;
+use common\models\ApiComponent;
 use GuzzleHttp\Exception\GuzzleException;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\base\ErrorException;
-use common\models\Domain;
-use common\models\ApiComponent;
 use yii\db\Exception;
 
 class ApplicationFilingForm extends Model
@@ -32,7 +32,6 @@ class ApplicationFilingForm extends Model
     public $email3;
     public $phones;
     public $faxes;
-
     public $domainName;
     public $formattedDomainName;
     public $vendorId;
@@ -75,11 +74,8 @@ class ApplicationFilingForm extends Model
     {
         return [
             [['legal', 'userName', 'index', 'city', 'street', 'domainName', 'email1', 'phones'], 'required'],
-            [['userName', 'legal',
-                'type', 'series', 'number', 'issuer',
-                'city', 'street',
-                'phones', 'faxes',
-                'domainName', 'vendorId', 'authCode'], 'string', 'max' => 255],
+            [['userName', 'legal', 'type', 'series', 'number', 'issuer', 'city', 'street',
+                'phones', 'faxes', 'domainName', 'vendorId', 'authCode'], 'string', 'max' => 255],
             [['email1', 'email2', 'email3'], 'email'],
             [['toBirthString', 'toIssuedString'], 'safe'],
             [['period', 'inn'], 'integer'],
